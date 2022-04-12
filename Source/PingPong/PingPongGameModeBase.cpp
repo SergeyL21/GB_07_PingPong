@@ -2,11 +2,25 @@
 
 #include "PingPongGameModeBase.h"
 
+#include "PingPongGate.h"
 #include "PingPongPlayerController.h"
 #include "PingPongPlayerPawn.h"
 
 #include "GameFramework/PlayerStart.h"
-#include "Kismet/GameplayStatics.h"
+#include "EngineUtils.h"
+
+// --------------------------------------------------------------------------------------
+namespace utils
+{
+	template<typename T>
+	void FindAllActors(UWorld* World, TArray<T*>& Out)
+	{
+		for (TActorIterator<T> It(World); It; ++It)
+		{
+			Out.Add(*It);
+		}
+	}
+} // namespace utils
 
 // --------------------------------------------------------------------------------------
 APingPongGameModeBase::APingPongGameModeBase()
@@ -26,34 +40,38 @@ void APingPongGameModeBase::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
 
-	UWorld* world { GetWorld() };
-	if(world && (!Player1Start || !Player2Start))
+	UWorld* World { GetWorld() };
+	if(World && (!Player1Start || !Player2Start))
 	{
-		TArray<AActor*> foundActors;
-		UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), foundActors);
-		if(foundActors.Num() > 0)
+		TArray<APlayerStart*> FoundActors;
+		utils::FindAllActors<APlayerStart>(World, FoundActors);
+		if(FoundActors.Num() > 0)
 		{
-			Player1Start = Cast<APlayerStart>(foundActors[0]);
+			Player1Start = FoundActors[0];
 		}
-		if(foundActors.Num() > 1)
+		if(FoundActors.Num() > 1)
 		{
-			Player2Start = Cast<APlayerStart>(foundActors[1]);
+			Player2Start = FoundActors[1];
 		}
 	}
-	APingPongPlayerController* currPlayer;
-	APlayerStart* startPos;
+	APingPongPlayerController* CurrPlayer;
+	APlayerStart* StartPos;
+	int32 PlayerID;
+	
 	if (Player1 == nullptr)
 	{
 		Player1 = Cast<APingPongPlayerController>(NewPlayer);
-		currPlayer = Player1;
-		startPos = Player1Start;
+		PlayerID = 1;
+		CurrPlayer = Player1;
+		StartPos = Player1Start;
 		UE_LOG(LogTemp, Warning, TEXT("PingPongGameMode: Init player 1"));
 	}
 	else if (Player2 == nullptr)
 	{
 		Player2 = Cast<APingPongPlayerController>(NewPlayer);
-		currPlayer = Player2;
-		startPos = Player2Start;
+		PlayerID = 2;
+		CurrPlayer = Player2;
+		StartPos = Player2Start;
 		UE_LOG(LogTemp, Warning, TEXT("PingPongGameMode: Init player 2"));
 	}
 	else
@@ -66,21 +84,64 @@ void APingPongGameModeBase::PostLogin(APlayerController* NewPlayer)
 	APingPongPlayerPawn* newPawn { Cast<APingPongPlayerPawn>(NewPlayer->GetPawn()) };
 	if (!newPawn)
 	{
-		newPawn = world->SpawnActor<APingPongPlayerPawn>(DefaultPawnClass);
+		newPawn = World->SpawnActor<APingPongPlayerPawn>(DefaultPawnClass);
 	}
+
+	TArray<APingPongGate*> FoundGateActors;
+	utils::FindAllActors<APingPongGate>(World, FoundGateActors);
+	auto FindGateByPlayerStart = [](const TArray<APingPongGate*>& Array, const APlayerStart* SearchObject)
+	{
+		auto Result = Array.FindByPredicate([&](const APingPongGate *Gate)
+		{
+			return Gate->PlayerStart == SearchObject;
+		});
+		return Result != nullptr ? *Result : nullptr;
+	};
 	
 	if (newPawn)
 	{
-		newPawn->SetActorLocation(startPos->GetActorLocation());
-		newPawn->SetActorRotation(startPos->GetActorRotation());
+		auto PlayerGate { FindGateByPlayerStart(FoundGateActors, StartPos) }; 
+		newPawn->SetActorLocation(StartPos->GetActorLocation());
+		newPawn->SetActorRotation(StartPos->GetActorRotation());
 		NewPlayer->SetPawn(newPawn);
-		currPlayer->SetStartTransform(startPos->GetActorTransform());
-		currPlayer->Initialize();
+		CurrPlayer->SetStartTransform(StartPos->GetActorTransform());
+		CurrPlayer->Client_InitializeHUD();
+		CurrPlayer->Server_Initialize(PlayerID, PlayerGate);
 	}
 	else
     {
 	    UE_LOG(LogTemp, Error, TEXT("Start position not setted in PingPongGameMode!"));
     }
+}
+
+// --------------------------------------------------------------------------------------
+void APingPongGameModeBase::PlayerGoal(int32 PlayerID)
+{
+	auto CurrentPlayerScore { 0 };
+	if (PlayerID == 1)
+	{
+		CurrentPlayerScore = ++Player2Score;
+	}
+	else if (PlayerID == 2)
+	{
+		CurrentPlayerScore = ++Player1Score;
+	}
+	
+	for (auto Iterator {GetWorld()->GetPlayerControllerIterator()}; Iterator; ++Iterator)
+	{
+		auto PlayerController { Cast<APingPongPlayerController>(*Iterator) };
+		if (PlayerController != nullptr)
+		{
+			if (PlayerController->GetPlayerID() == PlayerID)
+			{
+				PlayerController->UpdateWidgetEnemyScore(CurrentPlayerScore);
+			}
+			else
+			{
+				PlayerController->UpdateWidgetPlayerScore(CurrentPlayerScore);
+			}
+		}
+	}
 }
 
 
