@@ -28,6 +28,12 @@ protected:
 	
     UPROPERTY(EditAnywhere, BlueprintReadWrite)
     APlayerStart* Player2Start;
+
+	UPROPERTY()
+	int32 Player1Score { 0 };
+
+	UPROPERTY()
+	int32 Player2Score { 0 };
 	
 public:
     APingPongGameModeBase();
@@ -35,4 +41,6 @@ public:
     virtual void BeginPlay() override;
 	
     virtual void PostLogin(APlayerController* NewPlayer) override;
+
+	void PlayerGoal(int32 PlayerID);
 };
