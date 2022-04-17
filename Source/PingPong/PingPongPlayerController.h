@@ -9,6 +9,14 @@
 class APingPongPlatform;
 class APingPongGate;
 class UPlayerWidget;
+
+UENUM()
+enum class PlayerWindowId
+{
+	WaitForAnotherPlayers = 0,
+	Game = 1
+};
+
 /**
  * 
  */
@@ -50,6 +58,9 @@ public:
 	
 	UFUNCTION(Client, Reliable, WithValidation)
 	void Client_InitializeHUD();
+
+	UFUNCTION(Client, Reliable)
+	void Client_SetHUDWindow(PlayerWindowId windowId);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Initialize(int32 NewPlayerID, APingPongGate* NewGate);

@@ -43,4 +43,7 @@ public:
     virtual void PostLogin(APlayerController* NewPlayer) override;
 
 	void PlayerGoal(int32 PlayerID);
+
+private:
+	bool StartGame();
 };

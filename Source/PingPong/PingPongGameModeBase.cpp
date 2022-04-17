@@ -8,6 +8,7 @@
 
 #include "GameFramework/PlayerStart.h"
 #include "EngineUtils.h"
+#include "PingPongBall.h"
 
 // --------------------------------------------------------------------------------------
 namespace utils
@@ -107,6 +108,13 @@ void APingPongGameModeBase::PostLogin(APlayerController* NewPlayer)
 		CurrPlayer->SetStartTransform(StartPos->GetActorTransform());
 		CurrPlayer->Client_InitializeHUD();
 		CurrPlayer->Server_Initialize(PlayerID, PlayerGate);
+
+		if (Player1 != nullptr && Player2 != nullptr)
+		{
+			Player1->Client_SetHUDWindow(PlayerWindowId::Game);
+			Player2->Client_SetHUDWindow(PlayerWindowId::Game);
+			StartGame();
+		}
 	}
 	else
     {
@@ -142,6 +150,19 @@ void APingPongGameModeBase::PlayerGoal(int32 PlayerID)
 			}
 		}
 	}
+}
+
+// --------------------------------------------------------------------------------------
+bool APingPongGameModeBase::StartGame() {
+	TArray<APingPongBall*> FoundActors;
+	utils::FindAllActors<APingPongBall>(GetWorld(), FoundActors);
+	if (FoundActors.Num() > 0)
+	{
+		auto Ball { FoundActors.Last() };
+		Ball->StartMove();
+		return true;
+	}
+	return false;
 }
 
 

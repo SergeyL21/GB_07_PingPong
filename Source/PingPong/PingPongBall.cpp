@@ -119,7 +119,7 @@ void APingPongBall::Server_Move_Implementation(float DeltaTime)
 // --------------------------------------------------------------------------------------
 bool APingPongBall::Server_Move_Validate(float DeltaTime)
 {
-	return true;
+	return IsMoving;
 }
 
 // --------------------------------------------------------------------------------------

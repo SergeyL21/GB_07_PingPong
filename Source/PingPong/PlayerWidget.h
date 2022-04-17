@@ -7,10 +7,12 @@
 #include "PlayerWidget.generated.h"
 
 class UTextBlock;
+class UWidgetSwitcher;
 
 /**
  * 
  */
+
 UCLASS()
 class PINGPONG_API UPlayerWidget : public UUserWidget
 {
@@ -22,9 +24,15 @@ protected:
 
 	UPROPERTY(meta = (BindWidget))
 	UTextBlock* Text_EnemyScore;
+
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* WidgetSwitcher;
 	
 public:
     virtual void NativeConstruct() override;
+
+	UFUNCTION(BlueprintCallable)
+	void SwitchWidget(int32 id);
 	
 	UFUNCTION(BlueprintCallable)
 	void UpdatePlayerScore(int newValue);

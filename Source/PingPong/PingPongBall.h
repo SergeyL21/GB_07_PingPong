@@ -25,8 +25,8 @@ protected:
 	class UParticleSystem* HitEffect;
 	
 	UPROPERTY(Replicated)
-	bool IsMoving { true };
-	
+	bool IsMoving { false };
+
 public:
 	// Sets default values for this actor's properties
 	APingPongBall();
