@@ -3,11 +3,18 @@
 #include "PlayerWidget.h"
 
 #include "Components/TextBlock.h"
+#include "Components/WidgetSwitcher.h"
 
 // --------------------------------------------------------------------------------------
 void UPlayerWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
+}
+
+// --------------------------------------------------------------------------------------
+void UPlayerWidget::SwitchWidget(int32 windowId)
+{
+	WidgetSwitcher->SetActiveWidgetIndex(windowId);
 }
 
 // --------------------------------------------------------------------------------------

@@ -22,6 +22,15 @@ void APingPongPlayerController::SetStartTransform(const FTransform& NewStartTran
 }
 
 // --------------------------------------------------------------------------------------
+void APingPongPlayerController::Client_SetHUDWindow_Implementation(PlayerWindowId windowId)
+{
+	if (Widget)
+	{
+		Widget->SwitchWidget(static_cast<int32>(windowId));
+	}
+}
+
+// --------------------------------------------------------------------------------------
 void APingPongPlayerController::Server_Initialize_Implementation(int32 NewPlayerID, APingPongGate* NewGate)
 {
 	if (Platform)
