@@ -4,6 +4,8 @@
 
 #include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
+#include "Engine/AssetManager.h"
+#include "Engine/StreamableManager.h"
 
 // --------------------------------------------------------------------------------------
 APingPongPlatform::APingPongPlatform()
@@ -23,12 +25,33 @@ APingPongPlatform::APingPongPlatform()
 void APingPongPlatform::BeginPlay()
 {
 	Super::BeginPlay();
+
+	LoadBodyMesh();
 }
 
 // --------------------------------------------------------------------------------------
 void APingPongPlatform::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+}
+
+// --------------------------------------------------------------------------------------
+void APingPongPlatform::LoadBodyMesh()
+{
+	FStreamableDelegate LoadMeshDelegate;
+	LoadMeshDelegate.BindUObject(this, &APingPongPlatform::OnBodyMeshLoaded);
+	UAssetManager& AssetManager { UAssetManager::Get() };
+	FStreamableManager& StreamableManager { AssetManager.GetStreamableManager() };
+	AssetHandle = StreamableManager.RequestAsyncLoad(BodyMeshRef.ToSoftObjectPath(),LoadMeshDelegate);
+}
+
+// --------------------------------------------------------------------------------------
+void APingPongPlatform::OnBodyMeshLoaded()
+{
+	if (auto LoadedMesh = Cast<UStaticMesh>(AssetHandle.Get()->GetLoadedAsset()))
+	{
+		BodyMesh->SetStaticMesh(LoadedMesh);
+	}
 }
 
 // --------------------------------------------------------------------------------------
