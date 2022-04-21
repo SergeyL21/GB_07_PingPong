@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "PingPongBall.generated.h"
 
+struct FStreamableHandle;
+
 UCLASS()
 class PINGPONG_API APingPongBall : public AActor
 {
@@ -32,9 +34,14 @@ protected:
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Ball params")
 	class UParticleSystem* HitEffect;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<UParticleSystem> HitEffectRef;
 	
 	UPROPERTY(Replicated)
 	bool IsMoving { false };
+
+	TArray<TSharedPtr<FStreamableHandle>> AssetHandles;
 
 public:
 	// Sets default values for this actor's properties
@@ -43,8 +50,17 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	void LoadBodyResources(UStaticMesh*& OutBodyMesh, UMaterial*& OutBodyMaterial);
+
+	UFUNCTION(BlueprintCallable, CallInEditor)
+	void LoadBodyMesh();
+
+	void OnBodyMeshLoaded();
+
+	UMaterial* LoadBodyMaterial();
+
+	void LoadHitEffect();
+
+	void OnHitEffectLoaded();
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Move(float DeltaTime);

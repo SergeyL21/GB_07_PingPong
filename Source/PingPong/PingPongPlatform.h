@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "PingPongPlatform.generated.h"
 
+struct FStreamableHandle;
+
 UCLASS()
 class PINGPONG_API APingPongPlatform : public AActor
 {
@@ -17,9 +19,14 @@ protected:
 	
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadWrite, Category = "Components")
 	class UStaticMeshComponent* BodyMesh;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
+	TSoftObjectPtr<UStaticMesh> BodyMeshRef;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MoveSpeed { 100.f };
+
+	TSharedPtr<FStreamableHandle> AssetHandle;
 	
 public:
 	APingPongPlatform();
@@ -32,4 +39,8 @@ public:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_MoveRight(float AxisValue);
+	
+	void LoadBodyMesh();
+
+	void OnBodyMeshLoaded();
 };
