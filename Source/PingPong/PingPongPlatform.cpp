@@ -55,6 +55,15 @@ void APingPongPlatform::OnBodyMeshLoaded()
 }
 
 // --------------------------------------------------------------------------------------
+void APingPongPlatform::SetSkin_Implementation(UMaterial* Skin)
+{
+	if (BodyMesh)
+	{
+		BodyMesh->SetMaterial(0, Skin);
+	}
+}
+
+// --------------------------------------------------------------------------------------
 void APingPongPlatform::Server_MoveRight_Implementation(float AxisValue)
 {
 	if (AxisValue != 0)

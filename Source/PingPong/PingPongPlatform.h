@@ -43,4 +43,7 @@ public:
 	void LoadBodyMesh();
 
 	void OnBodyMeshLoaded();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SetSkin(UMaterial *Skin);
 };

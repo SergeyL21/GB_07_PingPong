@@ -7,11 +7,20 @@
 #include "UObject/NoExportTypes.h"
 #include "GameObjectAsset.generated.h"
 
+UENUM(Blueprintable)
+enum class EGameObjectType : uint8
+{
+	Platform,
+	Gate
+};
+
 USTRUCT(BlueprintType, Blueprintable)
 struct FGameObjectInfo
 {
 	GENERATED_BODY()
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	EGameObjectType Type;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	FText Name;
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
@@ -20,16 +29,12 @@ struct FGameObjectInfo
 	FSoftObjectPath PrimaryAsset;
 	UPROPERTY()
 	UPrimaryAssetLabel* PrimaryAssetLabel;
-
-	FORCEINLINE FText GetGameObjectName() const { return Name; }
-	
-	FORCEINLINE FText GetGameObjectDescription() const { return Description; }
 	
 	FString GetGameObjectReference();
 };
 
 UCLASS()
-class PINGPONG_API UMapInfoBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
+class PINGPONG_API UObjectInfoBlueprintFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 	/*Blueprint Function to return the value from the struct*/

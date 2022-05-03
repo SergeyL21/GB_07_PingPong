@@ -50,4 +50,7 @@ public:
 	void SetPlayerID(int32 ID);
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void SetSkin(UMaterial *Skin);
 };

@@ -81,3 +81,12 @@ void APingPongGate::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 	DOREPLIFETIME_CONDITION(APingPongGate, PlayerID, COND_SimulatedOnly);
 }
+
+// --------------------------------------------------------------------------------------
+void APingPongGate::SetSkin_Implementation(UMaterial* Skin)
+{
+	if (BodyMesh)
+	{
+		BodyMesh->SetMaterial(0, Skin);
+	}
+}
