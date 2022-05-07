@@ -22,6 +22,18 @@ void APingPongPlayerController::SetStartTransform(const FTransform& NewStartTran
 }
 
 // --------------------------------------------------------------------------------------
+void APingPongPlayerController::SetPlatformSkin(FSoftObjectPath SkinMaterialAsset)
+{
+	Server_SetPlatformSkin(SkinMaterialAsset);
+}
+
+// --------------------------------------------------------------------------------------
+void APingPongPlayerController::SetGateSkin(FSoftObjectPath SkinMaterialAsset)
+{
+	Server_SetGateSkin(SkinMaterialAsset);
+}
+
+// --------------------------------------------------------------------------------------
 void APingPongPlayerController::Client_SetHUDWindow_Implementation(PlayerWindowId windowId)
 {
 	if (Widget)
@@ -98,6 +110,32 @@ void APingPongPlayerController::UpdateWidgetPlayerScore_Implementation(int32 Sco
 void APingPongPlayerController::UpdateWidgetEnemyScore_Implementation(int32 Score)
 {
 	Widget->UpdateEnemyScore(Score);
+}
+
+// --------------------------------------------------------------------------------------
+void APingPongPlayerController::Server_SetPlatformSkin_Implementation(FSoftObjectPath SkinMaterialAsset)
+{
+	if (SkinMaterialAsset.IsValid())
+	{
+		auto SkinMaterial { Cast<UMaterial>(SkinMaterialAsset.TryLoad()) };
+		if (SkinMaterial && Platform)
+		{
+			Platform->SetSkin(SkinMaterial);
+		}
+	}
+}
+
+// --------------------------------------------------------------------------------------
+void APingPongPlayerController::Server_SetGateSkin_Implementation(FSoftObjectPath SkinMaterialAsset)
+{
+	if (SkinMaterialAsset.IsValid())
+	{
+		auto SkinMaterial { Cast<UMaterial>(SkinMaterialAsset.TryLoad()) };
+		if (SkinMaterial && Gate)
+		{
+			Gate->SetSkin(SkinMaterial);
+		}
+	}
 }
 
 // --------------------------------------------------------------------------------------

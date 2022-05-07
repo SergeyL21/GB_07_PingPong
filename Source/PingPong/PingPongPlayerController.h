@@ -53,6 +53,12 @@ public:
 	UFUNCTION()
 	void SetStartTransform(const FTransform &NewStartTransform);
 
+	UFUNCTION(BlueprintCallable)
+	void SetPlatformSkin(FSoftObjectPath SkinMaterialAsset);
+
+	UFUNCTION(BlueprintCallable)
+	void SetGateSkin(FSoftObjectPath SkinMaterialAsset);
+	
 	UFUNCTION()
 	FORCEINLINE int32 GetPlayerID() const { return PlayerID; }
 	
@@ -64,6 +70,12 @@ public:
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void Server_Initialize(int32 NewPlayerID, APingPongGate* NewGate);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetPlatformSkin(FSoftObjectPath SkinMaterialAsset);
+
+	UFUNCTION(Server, Reliable)
+	void Server_SetGateSkin(FSoftObjectPath SkinMaterialAsset);
 	
 	UFUNCTION(Server, Reliable, WithValidation)
 	void SpawnPlatform(TSubclassOf<APingPongPlatform> InPlatformClass);
